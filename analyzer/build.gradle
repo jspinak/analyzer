@@ -1,0 +1,105 @@
+import com.github.spotbugs.SpotBugsTask
+
+buildscript {
+	ext {
+		springBootVersion = '2.1.2.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+plugins {
+	id "com.github.spotbugs" version "1.6.9"
+	id "com.gradle.build-scan" version "1.16"
+}
+
+buildScan {
+	termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+	termsOfServiceAgree = 'yes'
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'checkstyle'
+apply plugin: 'pmd'
+
+checkstyle {
+	toolVersion '7.8.1'
+	configFile file("config/checkstyle/checkstyle.xml")
+}
+
+checkstyleMain {
+	source = 'src/main/java'
+}
+
+checkstyleTest {
+	source = 'src/test/java'
+}
+
+spotbugs {
+	ignoreFailures = false
+	toolVersion = '3.1.11'
+	reportsDir = file("$project.buildDir/reports/spotbugs")
+	effort = "max"
+}
+
+tasks.withType(SpotBugsTask) {
+	reports.xml.enabled = false
+	reports.html.enabled = true
+}
+
+tasks.withType(Pmd) {
+	reports {
+		xml.enabled = true
+		html.enabled = true
+	}
+}
+
+pmd {
+	pmdTest.enabled = false
+	ignoreFailures = true
+	ruleSets = [
+			'java-basic',
+			'java-braces',
+			'java-clone',
+			'java-finalizers',
+			'java-empty',
+			'java-imports',
+			'java-unusedcode',
+	]
+}
+
+group = 'game.data'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'org.postgresql:postgresql'
+	compileOnly 'org.projectlombok:lombok'
+	testCompile 'org.projectlombok:lombok'
+	compile 'io.projectreactor:reactor-core'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testCompile group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '2.1.0.RELEASE'
+	compile 'com.github.spotbugs:spotbugs:3.1.11'
+	compileOnly 'com.github.spotbugs:spotbugs-annotations:3.1.11'
+	compile group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
+	
+}

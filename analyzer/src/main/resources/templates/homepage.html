@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="../static/css/style :: style">
+    <title>Recipes</title>
+</head>
+<body>
+    <nav th:replace="../static/css/style :: main-menu">menu</nav>
+    <h2>Recipes</h2>
+    <table>
+		<thead>
+		<tr>
+			<th>Recipe</th>
+			<th>Inputs</th>
+		</tr>
+		</thead>
+		<tr th:each="recipe : ${recipes}">
+			<td th:text="${recipe.name}">Recipe name</td>
+			<td>
+				<table>
+				<tr th:each="input : ${recipe.inputs}">
+					<td th:text="${input.amount}">1</td>
+					<td th:text="${input.item.name}">input name</td>
+				</tr>
+				</table>
+			</td>
+        </tr>
+    </table>
+</body>
+</html>

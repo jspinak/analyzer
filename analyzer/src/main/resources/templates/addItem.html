@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="../static/css/style :: style">
+	<title>All Items</title>
+</head>
+<body>
+	<nav th:replace="../static/css/style :: main-menu">menu</nav>
+	<h1>Add Item</h1>
+
+	<table id="items">
+		<form th:action="@{/addItem}" th:object="${item}" method="post">
+			<div><input name="name" type="text" th:value="*{name}">Name</div>
+			<div>
+				<button type="submit" class="btn btn-primary">Save</button>
+			</div>
+		</form>
+		</tr>
+	</table>
+
+</body>
+</html>
