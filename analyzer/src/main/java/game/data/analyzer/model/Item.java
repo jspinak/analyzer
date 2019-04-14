@@ -11,10 +11,8 @@ import java.util.stream.Collectors;
 
 @Entity
 @Data
-
 @EqualsAndHashCode(exclude = "locations")
-@ToString(exclude = "locations")
-//@ToString(exclude = {"group","locations","effects","recipeInputs","recipeOutputs"})
+//@ToString(exclude = "locations") //must be excluded if fetch = Lazy
 public class Item extends ItemObject {
 
     @Id
@@ -28,12 +26,14 @@ public class Item extends ItemObject {
 	ItemGroup group;
 */
 
-	// with manytomany, we shouldn’t default to CascadeType.ALL because the CascadeType.REMOVE
-	// might end-up deleting more than we’re expecting
-	// we could use: cascade = {CascadeType.PERSIST, CascadeType.MERGE}; however, you can't cascade with entities
-	// that are already saved in a repository
+/*
+	with Many-to-Many, we shouldn’t default to CascadeType.ALL because the CascadeType.REMOVE
+	might end-up deleting more than we’re expecting
+	we could use: cascade = {CascadeType.PERSIST, CascadeType.MERGE};
+	FetchType.EAGER causes problems when there is no associated repository
+*/
 
-	//@JoinTable
+	// needs to be mapped by Item variable 'locations'
 	@ManyToMany(
 			fetch = FetchType.EAGER,
 			cascade = {CascadeType.PERSIST, CascadeType.MERGE}
@@ -44,16 +44,22 @@ public class Item extends ItemObject {
 	)
     Set<Location> locations = new HashSet<>();
 
-	//@ManyToMany(fetch = FetchType.EAGER, //EAGER ok here since few effects
-	//		mappedBy = "effectItems") //for ManyToMany, sets the join table use
-	Set<Effect> effects = new HashSet<>();
+/*
+	@ManyToMany(
+			fetch = FetchType.EAGER,
+			mappedBy = "items") //for ManyToMany, sets the join table use
+	Set<Location> locations = new HashSet<>();
+*/
 
-	//fetch = FetchType.EAGER, //EAGER causes problems when there is no associated repository
-	//mappedBy = "effectItem") //in the relational database, creates an "item_id" column in the "effect" table
-	//cascading is ok when the child entities are created along with the parent entity (one to one, one to many)
-	//  when cascading, the child entities shouldn't be saved separately to the repository
-	//@JoinColumn
-	//@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "effectItem", orphanRemoval = true)
+	@ManyToMany(
+		fetch = FetchType.EAGER,
+		cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+	)
+	@JoinTable(name = "Item_Effect",
+		joinColumns = { @JoinColumn(name = "item_id") },
+		inverseJoinColumns = { @JoinColumn(name = "effect_id") }
+	)
+	Set<Effect> effects = new HashSet<>();
 
     public Item() {}
     public Item(String name) {
@@ -75,30 +81,28 @@ public class Item extends ItemObject {
 		this.effects = effects;
 	}
     public void addLocation(Location location) {
-        if (locations == null) {
-            locations = new HashSet<>();
-        }
         locations.add(location);
-        location.getItems().add(this);
+        location.returnItems().add(this);
     }
 
     //if this isn't here, despite having the addEffect method in the parent class, the effects won't be saved
     public void addEffect(Effect effect) {
-		if (effects == null) {
-			effects = new HashSet<>();
-		}
 		effects.add(effect);
-		effect.getEffectItems().add(this);
+		effect.returnItems().add(this);
 	}
 
 	public Item DTO() {
-    	return new Item(name,description);
+    	return new Item(name);
 	}
 
-	public Set<Location> locationsDTO() {
-		Set<Location> locationsDTO = locations.stream().map(location -> location.DTO()).collect(Collectors.toSet());
-		return locationsDTO;
+	//this returns the locations LAZY (without items):  | Item -> Location -> Item |
+	//with this funtion it is							| Item -> Location |
+	public Set<Location> getLocations() {
+		return locations.stream().map(location -> location.DTO()).collect(Collectors.toSet());
 	}
 
+	public Set<Effect> getEffects() {
+    	return effects.stream().map(effect -> effect.DTO()).collect(Collectors.toSet());
+	}
 
 }

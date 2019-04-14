@@ -29,6 +29,10 @@ public class ItemService {
         return itemRepository.findAll();
     }
 
+    public List<Item> findAllEager() {
+        return itemRepository.findAllEager();
+    }
+
     public Item save(Item item) {
         return itemRepository.save(item);
     }
@@ -36,5 +40,10 @@ public class ItemService {
     public List<Item> retrieveByName(String name) {
         if (name == null || name.equals("")) return findAll();
         return itemRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    public List<Item> retrieveByNameEager(String name) {
+        if (name == null || name.equals("")) return itemRepository.findAllEager();
+        return itemRepository.findByNameContainingIgnoreCaseEager(name);
     }
 }

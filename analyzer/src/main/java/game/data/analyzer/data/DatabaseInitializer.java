@@ -44,11 +44,10 @@ public class DatabaseInitializer implements ServletContextInitializer {
 		Location heidel = new Location("Heidel");
 		locationService.save(velia);
 		locationService.save(heidel);
-		Set<Location> locations = new HashSet<>();
+/*		Set<Location> locations = new HashSet<>();
 		locations.add(velia);
 		locations.add(heidel);
-
-		List<Location> list =locationService.findAll();
+		*/
 
 		//effects
 		Effect baseCooking = new Effect("Cooking", 1.0, "Base cooking ingredient");
@@ -75,7 +74,7 @@ public class DatabaseInitializer implements ServletContextInitializer {
 		wheat = itemService.save(wheat);
 
 		ItemGroup cereals = new ItemGroup("cereals", wheat);
-		//itemGroupService.save(cereals);
+		itemGroupService.save(cereals);
 		cereals.addEffect(baseCooking);
 		itemGroupService.save(cereals);
 
@@ -173,17 +172,22 @@ public class DatabaseInitializer implements ServletContextInitializer {
 		essenceOfLiquorRecipe.setOutputs(essenceOfLiquorOutputs);
 		recipeService.save(essenceOfLiquorRecipe);
 
+		//for debugging
+		List<Location> locations = locationService.findAll();
+		List<Item> items = itemService.findAll();
+
 		System.out.println("_____________________ database ______________________");
 		System.out.println("Recipe Service, findAll _____");
 		recipeService.findAll().forEach(x -> System.out.println(x));
 		System.out.println("Item Service, findAll _____");
 		itemService.findAll().forEach(x -> System.out.println(x));
-		Item bierInDb = itemService.retrieveByName("bier").get(0);
-		Item wheatInDb = itemService.retrieveByName("wheat").get(0);
-		System.out.println("bier id/locations in db: "+bierInDb.getId()+"/"+bierInDb.getLocations());
+		Item bierInDb = itemService.retrieveByNameEager("").get(0);
+		Item wheatInDb = itemService.retrieveByNameEager("wheat").get(0);
+		System.out.println("bier id/locations in db: "+bierInDb.getId()+"/"+bierInDb.getLocations()+" | "+bierInDb);
 		System.out.println("wheat id/locations in db: "+wheatInDb.getId()+"/"+wheatInDb.getLocations());
 		System.out.println("Location Service, findAll _____");
-		locationService.findAll().forEach(x -> System.out.println(x));
+		List<Location> locationsWithItems = locationService.findAllEager();
+		locationsWithItems.forEach(x -> System.out.println(x));
 		System.out.println("item variables (not in database) _____");
 		System.out.println(bier);
 		System.out.println(wheat);

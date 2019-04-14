@@ -15,10 +15,6 @@ public class ItemObject extends GameObject {
 	private String name;
 	private String description;
 
-	@ManyToMany(fetch = FetchType.EAGER, //EAGER ok here since few effects
-			mappedBy = "effectItems") //for ManyToMany, sets the join table use
-	Set<Effect> effects = new HashSet<>();
-
 /*
 	@OneToMany//(cascade = CascadeType.ALL,
 			(fetch = FetchType.EAGER)//, //EAGER causes problems when there is no associated repository
@@ -30,13 +26,7 @@ public class ItemObject extends GameObject {
 		return effects;
 	}
 */
-	public void addEffect(Effect effect) {
-		if (effects == null) {
-			effects = new HashSet<>();
-		}
-		effects.add(effect);
-		effect.getEffectItems().add(this);
-	}
+
 /*
 	private void makeJsonEffects() {
 		effects.forEach(effect -> {

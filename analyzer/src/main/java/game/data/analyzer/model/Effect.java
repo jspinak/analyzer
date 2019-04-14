@@ -12,54 +12,35 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Data
-@EqualsAndHashCode(exclude = {"effectItems","effectItemGroups"})
-@ToString(exclude = {"effectItems","effectItemGroups"})
+@EqualsAndHashCode(exclude = {"items","itemGroups"}) //otherwise infinite loop
+@ToString(exclude = {"items","itemGroups"}) //otherwise infinite loop
 public class Effect extends GameObject {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	String use; //for example, Fighting
 	Double effect; //for example, +5%
 	String effectType; //for example, HP regeneration
 
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "Effect_Item",
-			joinColumns = {
-					@JoinColumn(
-							name = "effect_id",
-							referencedColumnName = "id"
-					)
-			},
-			inverseJoinColumns = {
-					@JoinColumn(
-							name = "item_id",
-							referencedColumnName = "id"
-					)
-			}
+	@ManyToMany(
+			fetch = FetchType.EAGER, //when LAZY, no items will be returned.
+			cascade = {CascadeType.PERSIST, CascadeType.DETACH},
+			mappedBy = "effects" //for ManyToMany, sets the join table use
 	)
-	Set<ItemObject> effectItems = new HashSet<>();
-/*
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "Effect_ItemGroup",
-			joinColumns = {
-					@JoinColumn(
-							name = "effect_id",
-							referencedColumnName = "id"
-					)
-			},
-			inverseJoinColumns = {
-					@JoinColumn(
-							name = "itemgroup_id",
-							referencedColumnName = "id"
-					)
-			}
+	Set<Item> items = new HashSet<>();
+
+	@ManyToMany(
+			fetch = FetchType.EAGER, //when LAZY, no items will be returned.
+			cascade = {CascadeType.PERSIST, CascadeType.DETACH},
+			mappedBy = "effects" //for ManyToMany, sets the join table use
 	)
-	Set<ItemObject> effectItemGroups = new HashSet<>();
-*/
+	Set<ItemGroup> itemGroups = new HashSet<>();
+
 	public Effect() {}
 	public Effect(String use, Double effect, String effectType) {
 		this.use = use;
@@ -67,5 +48,26 @@ public class Effect extends GameObject {
 		this.effectType = effectType;
 	}
 
+	public Effect DTO() {
+		return new Effect(use, effect, effectType);
+	}
+
+	//returns infinite loop in JSON without this function
+	public Set<Item> getItems() {
+		return items.stream().map(item -> item.DTO()).collect(Collectors.toSet());
+	}
+
+	public Set<Item> returnItems() {
+		return items;
+	}
+
+	//returns infinite loop in JSON without this function
+	public Set<ItemGroup> getItemGroups() {
+		return itemGroups.stream().map(itemGroup -> itemGroup.DTO()).collect(Collectors.toSet());
+	}
+
+	public Set<ItemGroup> returnItemGroups() {
+		return itemGroups;
+	}
 
 }

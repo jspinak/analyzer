@@ -28,6 +28,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/register").permitAll()
 				.antMatchers("/img/analyzer.jpeg").permitAll()
 				.antMatchers("/api/recipes").permitAll()
+				.antMatchers("/api/locations").permitAll()
+				.antMatchers("/api/locations2").permitAll()
 				.antMatchers("/h2-console").permitAll()
 				.antMatchers("/admin").hasRole(Roll.ADMIN.name())
 				.anyRequest().authenticated()

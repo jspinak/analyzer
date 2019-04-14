@@ -1,6 +1,7 @@
 package game.data.analyzer.web;
 
 import game.data.analyzer.data.LocationRepository;
+import game.data.analyzer.model.Item;
 import game.data.analyzer.model.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,8 @@ public class LocationService {
         return locationRepository.findAll();
     }
 
+    public List<Location> findAllEager() { return locationRepository.findAllEager(); }
+
     public void save(Location location) {
         locationRepository.save(location);
     }
@@ -35,5 +38,10 @@ public class LocationService {
     public List<Location> retrieveByName(String name) {
         if (name == null || name.equals("")) return findAll();
         return locationRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    public List<Location> retrieveByNameEager(String name) {
+        if (name == null || name.equals("")) return locationRepository.findAllEager();
+        return locationRepository.findByNameContainingIgnoreCaseEager(name);
     }
 }

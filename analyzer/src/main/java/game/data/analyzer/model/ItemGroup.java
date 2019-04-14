@@ -1,15 +1,17 @@
 package game.data.analyzer.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
-@Data //Lombok causes an out-of-bounds exception. problem with Item and ItemGroup.
-//a group contains items which contain the group...
-//@ToString(exclude = "items")
+@Data
+@EqualsAndHashCode(exclude = "effects")
+//@ToString(exclude = "effects")
 public class ItemGroup extends ItemObject {
 
 	@Id
@@ -25,13 +27,16 @@ public class ItemGroup extends ItemObject {
 	private Set<Item> items;
 	*/
 
-	//@OneToMany//(cascade = CascadeType.ALL,
-			//(fetch = FetchType.EAGER)//, //EAGER causes problems when there is no associated repository
-			//mappedBy = "effectItem") //in the relational database, creates an "item_id" column in the "effect" table
-/*	@ManyToMany(fetch = FetchType.EAGER, //EAGER ok here since few effects
-			mappedBy = "effectItemGroups") //for ManyToMany, sets the join table use
+	@ManyToMany(
+			fetch = FetchType.EAGER,
+			cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+	)
+	@JoinTable(name = "ItemGroup_Effect",
+			joinColumns = { @JoinColumn(name = "itemGroup_id") },
+			inverseJoinColumns = { @JoinColumn(name = "effect_id") }
+	)
 	Set<Effect> effects = new HashSet<>();
-*/
+
 	public ItemGroup() {}
 	public ItemGroup(String name, Item... items) {
 		this.name = name;
@@ -47,14 +52,19 @@ public class ItemGroup extends ItemObject {
 		items.add(item);
 		item.setGroup(this);
 	}
-
+*/
 
 	public void addEffect(Effect effect) {
-		if (effects == null) {
-			effects = new HashSet<>();
-		}
 		effects.add(effect);
-		effect.getEffectItemGroups().add(this);
+		effect.returnItemGroups().add(this);
 	}
-*/
+
+	public ItemGroup DTO() {
+		return new ItemGroup(name);
+	}
+
+	public Set<Effect> getEffects() {
+		return effects.stream().map(effect -> effect.DTO()).collect(Collectors.toSet());
+	}
+
 }

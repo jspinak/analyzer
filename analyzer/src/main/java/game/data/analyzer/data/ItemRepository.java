@@ -9,6 +9,9 @@ import java.util.List;
 @Transactional
 public interface ItemRepository extends BaseRepository<Item> {
 	@Query("from Item i left join fetch i.locations")
-	List<Item> findAllWithLocations();
+	List<Item> findAllEager();
+
+	@Query("from Item i left join fetch i.locations")
+	List<Item> findByNameContainingIgnoreCaseEager(String name);
 
 }
