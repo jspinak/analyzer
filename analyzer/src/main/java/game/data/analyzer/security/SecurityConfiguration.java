@@ -1,6 +1,6 @@
 package game.data.analyzer.security;
 
-import game.data.analyzer.web.ItemService;
+import game.data.analyzer.web.GameObjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
-	private ItemService itemService;
+	private GameObjectService gameObjectService;
 
 
 	@Bean
@@ -29,7 +29,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/img/analyzer.jpeg").permitAll()
 				.antMatchers("/api/recipes").permitAll()
 				.antMatchers("/api/locations").permitAll()
-				.antMatchers("/api/locations2").permitAll()
+				.antMatchers("/api/gameObjects").permitAll()
+				.antMatchers("/api/itemTree").permitAll()
 				.antMatchers("/h2-console").permitAll()
 				.antMatchers("/admin").hasRole(Roll.ADMIN.name())
 				.anyRequest().authenticated()

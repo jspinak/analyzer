@@ -101,5 +101,8 @@ dependencies {
 	compile 'com.github.spotbugs:spotbugs:3.1.11'
 	compileOnly 'com.github.spotbugs:spotbugs-annotations:3.1.11'
 	compile group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
-	
+	// https://mvnrepository.com/artifact/com.monitorjbl/json-view
+	compile group: 'com.monitorjbl', name: 'json-view', version: '1.0.1'
+
+
 }
